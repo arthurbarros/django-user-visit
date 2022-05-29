@@ -3,7 +3,7 @@ import sys
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
-
+print(required)
 try:
     from setuptools import setup
 except ImportError:

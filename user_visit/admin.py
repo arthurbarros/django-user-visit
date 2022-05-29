@@ -5,17 +5,17 @@ from .models import UserVisit
 
 class UserVisitAdmin(admin.ModelAdmin):
 
-    list_display = ("timestamp", "user", "session_key", "remote_addr", "user_agent")
+    list_display = ("timestamp",  "session_key", "remote_addr", "user_agent")
     list_filter = ("timestamp",)
     search_fields = (
-        "user__first_name",
-        "user__last_name",
-        "user__username",
+        # "user__first_name",
+        # "user__last_name",
+        # "user__username",
         "ua_string",
     )
-    raw_id_fields = ("user",)
+    # raw_id_fields = ("user",)
     readonly_fields = (
-        "user",
+        # "user",
         "hash",
         "timestamp",
         "session_key",

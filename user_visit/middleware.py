@@ -1,6 +1,6 @@
 import logging
 import typing
-
+import uuid
 import django.db
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpRequest, HttpResponse
@@ -30,14 +30,17 @@ class UserVisitMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> typing.Optional[HttpResponse]:
+        user_cookie_id = request.COOKIES.get('user_cookie_id', str(uuid.uuid4())) 
+
         if request.user.is_anonymous:
             return self.get_response(request)
 
         if RECORDING_BYPASS(request):
             return self.get_response(request)
 
-        uv = UserVisit.objects.build(request, timezone.now())
+        uv = UserVisit.objects.build(request, timezone.now(), user_cookie_id)
         if not UserVisit.objects.filter(hash=uv.hash).exists():
             save_user_visit(uv)
-
-        return self.get_response(request)
+        response = self.get_response(request)
+        response.set_cookie('user_cookie_id', uv.user_cookie_id)
+        return response

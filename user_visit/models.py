@@ -31,10 +31,10 @@ def parse_ua_string(request: HttpRequest) -> str:
 class UserVisitManager(models.Manager):
     """Custom model manager for UserVisit objects."""
 
-    def build(self, request: HttpRequest, timestamp: datetime.datetime) -> UserVisit:
+    def build(self, request: HttpRequest, timestamp: datetime.datetime, user_cookie_id: uuid.uuid4) -> UserVisit:
         """Build a new UserVisit object from a request, without saving it."""
         uv = UserVisit(
-            user=request.user,
+            user_cookie_id=user_cookie_id,
             timestamp=timestamp,
             session_key=request.session.session_key,
             remote_addr=parse_remote_addr(request),
@@ -61,9 +61,10 @@ class UserVisit(models.Model):
 
     """
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="user_visits", on_delete=models.CASCADE
-    )
+    # user = models.ForeignKey(
+    #     settings.AUTH_USER_MODEL, related_name="user_visits", on_delete=models.CASCADE
+    # )
+    user_cookie_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     timestamp = models.DateTimeField(
         help_text=_lazy("The time at which the first visit of the day was recorded"),
         default=timezone.now,
@@ -136,4 +137,5 @@ class UserVisit(models.Model):
         h.update(self.session_key.encode())
         h.update(self.remote_addr.encode())
         h.update(self.ua_string.encode())
+        h.update(self.user_cookie_id.encode())
         return h

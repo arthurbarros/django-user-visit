@@ -35,7 +35,7 @@ setup(
     version=version,
     long_description=readme,
     packages=[
-        'django_user_visit',
+        'user_visit',
     ],
     include_package_data=True,
     install_requires=required,
